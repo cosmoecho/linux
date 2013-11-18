@@ -263,4 +263,47 @@ struct xen_remove_from_physmap {
 };
 DEFINE_GUEST_HANDLE_STRUCT(xen_remove_from_physmap);
 
+/* vNUMA structures */
+struct vmemrange {
+	uint64_t start, end;
+	/* reserved */
+	uint64_t _padm;
+};
+DEFINE_GUEST_HANDLE_STRUCT(vmemrange);
+
+struct vnuma_topology_info {
+	/* OUT */
+	domid_t domid;
+	uint32_t __pad;
+	/* IN */
+	/* number of virtual numa nodes */
+	union {
+		GUEST_HANDLE(uint) nr_nodes;
+		uint64_t    _padn;
+	};
+	/* distance table */
+	union {
+		GUEST_HANDLE(uint) distance;
+		uint64_t    _padd;
+	};
+	/* cpu mapping to vnodes */
+	union {
+		GUEST_HANDLE(uint) cpu_to_node;
+		uint64_t    _padc;
+	};
+	/*
+	* memory areas constructed by Xen, start and end
+	* of the ranges are specific to domain e820 map.
+	* Xen toolstack constructs these ranges for domain
+	* when building it.
+	*/
+	union {
+		GUEST_HANDLE(vmemrange) memrange;
+		uint64_t    _padm;
+	};
+};
+DEFINE_GUEST_HANDLE_STRUCT(vnuma_topology_info);
+
+#define XENMEM_get_vnuma_info	25
+
 #endif /* __XEN_PUBLIC_MEMORY_H__ */
